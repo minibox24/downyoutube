@@ -12,6 +12,7 @@ import os
 class Downloader:
     def __init__(self, key: str):
         self.created_at = time.time()
+        self.finished_at = 999999999999999
 
         self.key = key
 
@@ -76,6 +77,7 @@ class Downloader:
         await asyncio.to_thread(ytdl.download, [url])
 
         self._now = (2, 100.0)
+        self.finished_at = time.time()
 
     async def remove(self):
         ls = await asyncio.to_thread(os.listdir, "./temp")
@@ -91,13 +93,13 @@ app.ctx.downloads = {}
 
 async def remove_downloads():
     while True:
-        await asyncio.sleep(10)
+        await asyncio.sleep(60)
 
         for key, download in list(app.ctx.downloads.items()):
             if (
                 download.get_status()["status"] == "finished"
-                and time.time() - download.created_at > 60 * 1
-            ) or time.time() - download.created_at > 60 * 30:
+                and time.time() - download.finished_at > 60 * 10
+            ) or time.time() - download.created_at > 60 * 60:
                 await download.remove()
                 del app.ctx.downloads[key]
 
