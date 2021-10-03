@@ -4,6 +4,7 @@ from sanic.response import json
 from youtube_dl import YoutubeDL
 import asyncio
 import time
+import uuid
 import re
 
 
@@ -77,6 +78,7 @@ class Downloader:
 
 
 app = Sanic(__name__)
+app.ctx.downloads = {}
 
 
 @app.get("/info")
@@ -84,6 +86,23 @@ async def route_info(req: Request):
     info = await Downloader.info(req.args.get("query"))
 
     return json(info)
+
+
+@app.post("/download")
+async def route_download(req: Request):
+    key = str(uuid.uuid4())
+
+    url = req.json.get("url", "")
+    audio = bool(req.json.get("audio", False))
+
+    if not re.match(r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$", url):
+        return json({"error": "invalid url"}), 400
+
+    app.ctx.downloads[key] = Downloader(key)
+
+    asyncio.create_task(app.ctx.downloads[key].download(url, audio))
+
+    return json({"key": key})
 
 
 app.run("0.0.0.0")
