@@ -1,5 +1,5 @@
 from sanic import Sanic, Request
-from sanic.response import json
+from sanic.response import json, file
 
 from youtube_dl import YoutubeDL
 import asyncio
@@ -134,6 +134,22 @@ async def route_status(req: Request):
         return json({"error": "invalid key"}, 400)
 
     return json(app.ctx.downloads[key].get_status())
+
+
+@app.get("/file")
+async def route_file(req: Request):
+    key = req.args.get("key")
+
+    if key not in app.ctx.downloads:
+        return json({"error": "invalid key"}, 400)
+
+    ls = await asyncio.to_thread(os.listdir, "./temp")
+
+    for i in ls:
+        if key in i:
+            return await file(f"./temp/{i}")
+
+    return json({"error": "file not found"}, 404)
 
 
 if not os.path.isdir("./temp"):
