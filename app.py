@@ -1,3 +1,6 @@
+from sanic import Sanic, Request
+from sanic.response import json
+
 from youtube_dl import YoutubeDL
 import asyncio
 import time
@@ -71,3 +74,16 @@ class Downloader:
         await asyncio.to_thread(ytdl.download, [url])
 
         self._now = (2, 100.0)
+
+
+app = Sanic(__name__)
+
+
+@app.get("/info")
+async def route_info(req: Request):
+    info = await Downloader.info(req.args.get("query"))
+
+    return json(info)
+
+
+app.run("0.0.0.0")
