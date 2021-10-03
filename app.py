@@ -106,6 +106,16 @@ async def route_download(req: Request):
     return json({"key": key})
 
 
+@app.get("/status")
+async def route_status(req: Request):
+    key = req.args.get("key")
+
+    if key not in app.ctx.downloads:
+        return json({"error": "invalid key"}), 400
+
+    return json(app.ctx.downloads[key].get_status())
+
+
 if not os.path.isdir("./temp"):
     os.makedirs("./temp")
 
