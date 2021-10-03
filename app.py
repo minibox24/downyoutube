@@ -77,9 +77,29 @@ class Downloader:
 
         self._now = (2, 100.0)
 
+    async def remove(self):
+        ls = await asyncio.to_thread(os.listdir, "./temp")
+
+        for i in ls:
+            if self.key in i:
+                await asyncio.to_thread(os.remove, f"./temp/{i}")
+
 
 app = Sanic(__name__)
 app.ctx.downloads = {}
+
+
+async def remove_downloads():
+    while True:
+        await asyncio.sleep(10)
+
+        for key, download in list(app.ctx.downloads.items()):
+            if (
+                download.get_status()["status"] == "finished"
+                and time.time() - download.created_at > 60 * 1
+            ) or time.time() - download.created_at > 60 * 30:
+                await download.remove()
+                del app.ctx.downloads[key]
 
 
 @app.get("/info")
@@ -97,7 +117,7 @@ async def route_download(req: Request):
     audio = bool(req.json.get("audio", False))
 
     if not re.match(r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$", url):
-        return json({"error": "invalid url"}), 400
+        return json({"error": "invalid url"}, 400)
 
     app.ctx.downloads[key] = Downloader(key)
 
@@ -111,7 +131,7 @@ async def route_status(req: Request):
     key = req.args.get("key")
 
     if key not in app.ctx.downloads:
-        return json({"error": "invalid key"}), 400
+        return json({"error": "invalid key"}, 400)
 
     return json(app.ctx.downloads[key].get_status())
 
@@ -119,4 +139,5 @@ async def route_status(req: Request):
 if not os.path.isdir("./temp"):
     os.makedirs("./temp")
 
+app.add_task(remove_downloads())
 app.run("0.0.0.0")
