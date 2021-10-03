@@ -10,11 +10,14 @@ import os
 
 
 class Downloader:
-    def __init__(self, key: str):
+    def __init__(self, key: str, url: str, audio: bool = False):
         self.created_at = time.time()
         self.finished_at = 999999999999999
 
         self.key = key
+        self.url = url
+        self.audio = audio
+        self.title = ""
 
         self._now = (0, 0)
 
@@ -52,7 +55,7 @@ class Downloader:
             "progress": self._now[1],
         }
 
-    async def download(self, url: str, audio: bool = False):
+    async def download(self):
         options = {
             "format": "best",
             "merge-output-format": "mp4",
@@ -62,7 +65,7 @@ class Downloader:
             "quiet": True,
         }
 
-        if audio:
+        if self.audio:
             options["format"] = "bestaudio"
             options["postprocessors"] = [
                 {
@@ -74,17 +77,15 @@ class Downloader:
 
         ytdl = YoutubeDL(options)
 
-        await asyncio.to_thread(ytdl.download, [url])
+        info = await asyncio.to_thread(ytdl.extract_info, self.url)
 
+        self.title = info["title"]
         self._now = (2, 100.0)
         self.finished_at = time.time()
 
     async def remove(self):
-        ls = await asyncio.to_thread(os.listdir, "./temp")
-
-        for i in ls:
-            if self.key in i:
-                await asyncio.to_thread(os.remove, f"./temp/{i}")
+        ext = "mp3" if self.audio else "mp4"
+        await asyncio.to_thread(os.remove, f"./temp/{self.key}.{ext}")
 
 
 app = Sanic(__name__)
@@ -121,9 +122,9 @@ async def route_download(req: Request):
     if not re.match(r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$", url):
         return json({"error": "invalid url"}, 400)
 
-    app.ctx.downloads[key] = Downloader(key)
+    app.ctx.downloads[key] = Downloader(key, url, audio)
 
-    asyncio.create_task(app.ctx.downloads[key].download(url, audio))
+    asyncio.create_task(app.ctx.downloads[key].download())
 
     return json({"key": key})
 
@@ -145,13 +146,13 @@ async def route_file(req: Request):
     if key not in app.ctx.downloads:
         return json({"error": "invalid key"}, 400)
 
-    ls = await asyncio.to_thread(os.listdir, "./temp")
+    download = app.ctx.downloads[key]
+    ext = "mp3" if download.audio else "mp4"
 
-    for i in ls:
-        if key in i:
-            return await file(f"./temp/{i}")
+    location = f"./temp/{download.key}.{ext}"
+    filename = f"{download.title}.{ext}"
 
-    return json({"error": "file not found"}, 404)
+    return await file(location, filename=filename)
 
 
 if not os.path.isdir("./temp"):
