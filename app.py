@@ -6,6 +6,7 @@ import asyncio
 import time
 import uuid
 import re
+import os
 
 
 class Downloader:
@@ -104,5 +105,8 @@ async def route_download(req: Request):
 
     return json({"key": key})
 
+
+if not os.path.isdir("./temp"):
+    os.makedirs("./temp")
 
 app.run("0.0.0.0")
