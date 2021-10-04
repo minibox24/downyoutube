@@ -1,5 +1,6 @@
 from sanic import Sanic, Request
 from sanic.response import json, file
+from sanic_cors import CORS
 
 from youtube_dl import YoutubeDL
 import asyncio
@@ -90,6 +91,8 @@ class Downloader:
 
 app = Sanic(__name__)
 app.ctx.downloads = {}
+
+CORS(app)
 
 
 async def remove_downloads():
