@@ -23,7 +23,7 @@ export default function HomeScreen({ navigation }) {
         onChangeText={setQuery}
       />
       <TouchableOpacity
-        onPress={() => navigation.navigate("Details")}
+        onPress={() => navigation.navigate("Details", { query })}
         style={styles.buttonContainer}
       >
         <Text style={styles.buttonText}>검색</Text>
