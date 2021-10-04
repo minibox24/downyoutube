@@ -1,18 +1,13 @@
+from sanic import Sanic, Request
+from sanic.response import json, file
+from sanic_cors import CORS
+
 from youtube_dl import YoutubeDL
 import asyncio
-import os
-import re
 import time
 import uuid
-import json as json_m
-
-import aiohttp
-from sanic import Request, Sanic
-from sanic.response import file, json
-from sanic_cors import CORS
-from youtube_dl import YoutubeDL
-
-DATA_REGEX = re.compile(r'(?:window\["ytInitialData"]|ytInitialData)\W?=\W?({.*?});')
+import re
+import os
 
 
 class Downloader:
@@ -29,74 +24,23 @@ class Downloader:
 
     @staticmethod
     async def info(query: str):
-        async with aiohttp.ClientSession() as sess:
-            if re.match(r"^(https?://)?(www.youtube.com|youtu.?be)/.+$", query):
-                async with sess.get(
-                    query,
-                    headers={
-                        "x-youtube-client-name": "1",
-                        "x-youtube-client-version": "2.20201030.01.00",
-                    },
-                ) as resp:
-                    raw: str = await resp.text()
-                    data = DATA_REGEX.search(raw)
-                    data = json_m.loads(data.group(1))
+        ytdl = YoutubeDL({"noplaylist": True, "quiet": True})
 
-                    renderer = data["contents"]["videoPrimaryInfoRenderer"]
+        if re.match(r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$", query):
+            info = await asyncio.to_thread(ytdl.extract_info, query, download=False)
+        else:
+            result = await asyncio.to_thread(
+                ytdl.extract_info, f"ytsearch:{query}", download=False
+            )
 
-                    return {
-                        "id": renderer["videoId"],
-                        "title": renderer["title"]["runs"][0]["text"],
-                        "webpage_url": "https://www.youtube.com/watch?v="
-                        + renderer["videoId"],
-                        "duration": sum(
-                            [
-                                int(value) * (60 ** index)
-                                for index, value in enumerate(
-                                    reversed(
-                                        renderer["lengthText"]["simpleText"].split(":")
-                                    )
-                                )
-                            ]
-                        ),
-                    }
-            else:
-                async with sess.get(
-                    "https://www.youtube.com/results",
-                    headers={
-                        "x-youtube-client-name": "1",
-                        "x-youtube-client-version": "2.20201030.01.00",
-                    },
-                    params={"search_query": query},
-                ) as resp:
-                    raw: str = await resp.text()
-                    data = DATA_REGEX.search(raw)
-                    data = json_m.loads(data.group(1))
+            info = result["entries"][0]
 
-                    renderer = data["contents"]["twoColumnSearchResultsRenderer"][
-                        "primaryContents"
-                    ]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"][
-                        "contents"
-                    ][0][
-                        "videoRenderer"
-                    ]
-                    return {
-                        "id": renderer["videoId"],
-                        "title": renderer["title"]["runs"][0]["text"],
-                        "webpage_url": "https://www.youtube.com/watch?v="
-                        + renderer["videoId"],
-                        "uploader": renderer["ownerText"]["runs"][0]["text"],
-                        "duration": sum(
-                            [
-                                int(value) * (60 ** index)
-                                for index, value in enumerate(
-                                    reversed(
-                                        renderer["lengthText"]["simpleText"].split(":")
-                                    )
-                                )
-                            ]
-                        ),
-                    }
+        return {
+            "id": info["id"],
+            "title": info["title"],
+            "thumbnail": info["thumbnails"][-1]["url"],
+            "uploader": info["uploader"],
+        }
 
     def _progress_hook(self, data):
         downloaded_bytes = data["downloaded_bytes"]
@@ -178,7 +122,7 @@ async def route_download(req: Request):
     url = req.json.get("url", "")
     audio = bool(req.json.get("audio", False))
 
-    if not re.match(r"^(https?://)?(www\.youtube\.com|youtu\.?be)/.+$", url):
+    if not re.match(r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$", url):
         return json({"error": "invalid url"}, 400)
 
     app.ctx.downloads[key] = Downloader(key, url, audio)
