@@ -75,7 +75,7 @@ class Downloader:
                         "primaryContents"
                     ]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"][
                         "contents"
-                    ][
+                    ][0][
                         "videoRenderer"
                     ]
                     return {
