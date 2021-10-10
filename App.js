@@ -32,12 +32,16 @@ function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
-          options={{ headerShown: false }}
           name="Home"
           component={HomeScreen}
+          options={{ headerShown: false }}
         />
         <Stack.Screen name="Details" component={DetailsScreen} />
-        <Stack.Screen name="Download" component={DownloadScreen} />
+        <Stack.Screen
+          name="Download"
+          component={DownloadScreen}
+          options={{ headerLeft: () => null }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
