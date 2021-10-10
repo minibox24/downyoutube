@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 
 export default function DownloadScreen({ navigation, route }) {
   let [key, setKey] = React.useState(null);
@@ -50,12 +50,28 @@ export default function DownloadScreen({ navigation, route }) {
     };
   }, []);
 
+  const status = {
+    created: "준비 중",
+    downloading: "다운로드 중",
+    converting: "변환 중",
+    finished: "완료",
+  }[data.status];
+
   return (
     <View style={styles.main}>
-      <Text>{route.params.id}</Text>
-      <Text>{key}</Text>
-      <Text>{data.progress}</Text>
-      <Text>{data.status}</Text>
+      {data.status !== "finished" ? (
+        <ActivityIndicator
+          size="large"
+          color="#00ccff"
+          style={{ marginBottom: 10 }}
+        />
+      ) : null}
+
+      <Text>{status}</Text>
+
+      {data.status !== "finished" ? (
+        <Text>{data.progress.toFixed(2)}%</Text>
+      ) : null}
     </View>
   );
 }
