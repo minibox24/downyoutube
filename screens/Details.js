@@ -17,6 +17,10 @@ export default function DetailsScreen({ navigation, route }) {
     uploader: null,
   });
 
+  const download = (audio) => {
+    navigation.navigate("Download", { id: data.id, audio: audio });
+  };
+
   React.useEffect(() => {
     fetch(`http://127.0.0.1:8000/info?query=${route.params.query}`)
       .then((res) => res.json())
@@ -56,10 +60,16 @@ export default function DetailsScreen({ navigation, route }) {
         <Text numberOfLines={1}>{data.uploader}</Text>
       </View>
       <View style={styles.buttons}>
-        <TouchableOpacity onPress={() => {}} style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={() => download(false)}
+          style={styles.buttonContainer}
+        >
           <Text style={styles.buttonText}>영상</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {}} style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={() => download(true)}
+          style={styles.buttonContainer}
+        >
           <Text style={styles.buttonText}>음성</Text>
         </TouchableOpacity>
       </View>
