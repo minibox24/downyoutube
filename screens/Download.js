@@ -28,6 +28,13 @@ export default function DownloadScreen({ navigation, route }) {
       const response = await fetch(`http://127.0.0.1:8000/status?key=${key}`);
       const responseJson = await response.json();
 
+      if (
+        responseJson.progress == 100 &&
+        responseJson.status === "downloading"
+      ) {
+        responseJson.status = "converting";
+      }
+
       setData(responseJson);
 
       if (responseJson.status === "finished") {
