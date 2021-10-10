@@ -1,10 +1,33 @@
 import React from "react";
-import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ActivityIndicator,
+  Platform,
+} from "react-native";
+
+import * as FileSystem from "expo-file-system";
 
 export default function DownloadScreen({ navigation, route }) {
   let [key, setKey] = React.useState(null);
   let [loop, setLoop] = React.useState(null);
   const [data, setData] = React.useState({ progress: 0, status: "created" });
+
+  const download = () => {
+    if (data.status === "finished") {
+      if (Platform.OS === "web") {
+        window.open(`http://127.0.0.1:8000/file?key=${key}`);
+      } else {
+        downloadFile();
+      }
+    }
+  };
+
+  const downloadFile = () => {
+    const url = `http://127.0.0.1:8000/file?key=${key}`;
+    console.log(FileSystem.documentDirectory);
+  };
 
   React.useEffect(() => {
     (async () => {
@@ -50,6 +73,8 @@ export default function DownloadScreen({ navigation, route }) {
     };
   }, []);
 
+  React.useEffect(download);
+
   const status = {
     created: "준비 중",
     downloading: "다운로드 중",
@@ -71,7 +96,11 @@ export default function DownloadScreen({ navigation, route }) {
 
       {data.status !== "finished" ? (
         <Text>{data.progress.toFixed(2)}%</Text>
-      ) : null}
+      ) : (
+        <Text onPress={() => download()} style={styles.downloadButton}>
+          다운로드하지 못하셨나요?
+        </Text>
+      )}
     </View>
   );
 }
@@ -81,5 +110,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  downloadButton: {
+    color: "#0074CC",
+    fontWeight: "bold",
   },
 });
