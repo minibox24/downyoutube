@@ -40,6 +40,7 @@ class Downloader:
             "title": info["title"],
             "thumbnail": info["thumbnails"][-1]["url"],
             "uploader": info["uploader"],
+            "m4a_url": info["requested_formats"][1]["url"],
         }
 
     def _progress_hook(self, data):
