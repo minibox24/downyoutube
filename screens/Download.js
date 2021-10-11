@@ -9,7 +9,7 @@ import {
 
 import { openBrowserAsync } from "expo-web-browser";
 
-export default function DownloadScreen({ navigation, route }) {
+export default function DownloadScreen({ route }) {
   let [key, setKey] = React.useState(null);
   let [loop, setLoop] = React.useState(null);
   const [data, setData] = React.useState({ progress: 0, status: "created" });
