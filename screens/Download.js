@@ -16,13 +16,7 @@ export default function DownloadScreen({ route }) {
 
   const download = () => {
     if (data.status === "finished") {
-      const url = `https://c82a-58-123-152-78.ngrok.io/file?key=${key}`;
-
-      if (Platform.OS === "web") {
-        window.open(url);
-      } else {
-        openBrowserAsync(url);
-      }
+      openBrowserAsync(`https://c82a-58-123-152-78.ngrok.io/file?key=${key}`);
     }
   };
 
