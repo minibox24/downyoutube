@@ -7,7 +7,7 @@ import {
   Platform,
 } from "react-native";
 
-import * as FileSystem from "expo-file-system";
+import { openBrowserAsync } from "expo-web-browser";
 
 export default function DownloadScreen({ navigation, route }) {
   let [key, setKey] = React.useState(null);
@@ -16,28 +16,28 @@ export default function DownloadScreen({ navigation, route }) {
 
   const download = () => {
     if (data.status === "finished") {
+      const url = `https://c82a-58-123-152-78.ngrok.io/file?key=${key}`;
+
       if (Platform.OS === "web") {
-        window.open(`http://127.0.0.1:8000/file?key=${key}`);
+        window.open(url);
       } else {
-        downloadFile();
+        openBrowserAsync(url);
       }
     }
   };
 
-  const downloadFile = () => {
-    const url = `http://127.0.0.1:8000/file?key=${key}`;
-    console.log(FileSystem.documentDirectory);
-  };
-
   React.useEffect(() => {
     (async () => {
-      const response = await fetch(`http://127.0.0.1:8000/download`, {
-        method: "POST",
-        body: JSON.stringify({
-          url: `https://youtu.be/${route.params.id}`,
-          audio: route.params.audio,
-        }),
-      });
+      const response = await fetch(
+        `https://c82a-58-123-152-78.ngrok.io/download`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            url: `https://youtu.be/${route.params.id}`,
+            audio: route.params.audio,
+          }),
+        }
+      );
 
       const responseJson = await response.json();
 
@@ -48,7 +48,9 @@ export default function DownloadScreen({ navigation, route }) {
     const intervalId = setInterval(async () => {
       if (!key) return;
 
-      const response = await fetch(`http://127.0.0.1:8000/status?key=${key}`);
+      const response = await fetch(
+        `https://c82a-58-123-152-78.ngrok.io/status?key=${key}`
+      );
       const responseJson = await response.json();
 
       if (

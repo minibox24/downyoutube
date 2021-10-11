@@ -22,7 +22,9 @@ export default function DetailsScreen({ navigation, route }) {
   };
 
   React.useEffect(() => {
-    fetch(`http://127.0.0.1:8000/info?query=${route.params.query}`)
+    fetch(
+      `https://c82a-58-123-152-78.ngrok.io/info?query=${route.params.query}`
+    )
       .then((res) => res.json())
       .then((data) => {
         setData({
