@@ -23,16 +23,28 @@ export default function DetailsScreen({ navigation, route }) {
   });
 
   const audioAlert = () => {
-    Alert.alert("음성", "포맷을 선택해주세요.", [
-      {
-        text: "mp3",
-        onPress: () => download(true),
-      },
-      {
-        text: "m4a",
-        onPress: () => openBrowserAsync(data.m4aUrl),
-      },
-    ]);
+    if (Platform.OS === "web") {
+      const choose = confirm(
+        "음성 포맷을 선택해주세요.\n\n확인: mp4\n취소: m4a"
+      );
+
+      if (choose) {
+        download(true);
+      } else {
+        openBrowserAsync(data.m4aUrl);
+      }
+    } else {
+      Alert.alert("음성", "포맷을 선택해주세요.", [
+        {
+          text: "mp3",
+          onPress: () => download(true),
+        },
+        {
+          text: "m4a",
+          onPress: () => openBrowserAsync(data.m4aUrl),
+        },
+      ]);
+    }
   };
 
   const download = (audio) => {
