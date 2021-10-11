@@ -8,8 +8,14 @@ import {
   Platform,
 } from "react-native";
 
+import { openBrowserAsync } from "expo-web-browser";
+
 export default function HomeScreen({ navigation, route }) {
   const [query, setQuery] = React.useState("");
+
+  const appDownload = () => {
+    openBrowserAsync("about:blank");
+  };
 
   React.useEffect(() => {
     if (Platform.OS === "web") {
@@ -41,6 +47,14 @@ export default function HomeScreen({ navigation, route }) {
       >
         <Text style={styles.buttonText}>검색</Text>
       </TouchableOpacity>
+
+      {Platform.OS === "web" ? (
+        <Text onPress={() => appDownload()} style={styles.appDownloadButton}>
+          안드로이드 앱 다운로드
+        </Text>
+      ) : (
+        <View style={{ marginTop: "auto" }} />
+      )}
     </View>
   );
 }
@@ -55,6 +69,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontFamily: "pretendard",
     marginBottom: 10,
+    marginTop: "auto",
   },
   input: {
     width: "90%",
@@ -76,5 +91,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 15,
+  },
+  appDownloadButton: {
+    marginTop: "auto",
+    marginBottom: 10,
+    color: "#0074CC",
+    fontWeight: "bold",
   },
 });
