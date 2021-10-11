@@ -37,11 +37,7 @@ function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="Details" component={DetailsScreen} />
-        <Stack.Screen
-          name="Download"
-          component={DownloadScreen}
-          options={{ headerLeft: () => null }}
-        />
+        <Stack.Screen name="Download" component={DownloadScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
