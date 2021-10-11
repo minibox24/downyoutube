@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Platform,
 } from "react-native";
 
 import { openBrowserAsync } from "expo-web-browser";
@@ -54,7 +55,12 @@ export default function DetailsScreen({ navigation, route }) {
         });
       })
       .catch((_) => {
-        Alert.alert("오류 발생", "영상을 불러오던 중 오류가 발생했습니다.");
+        if (Platform.OS === "web") {
+          alert("영상을 불러오던 중 오류가 발생했습니다.");
+        } else {
+          Alert.alert("오류 발생", "영상을 불러오던 중 오류가 발생했습니다.");
+        }
+
         navigation.goBack();
       });
   }, []);
