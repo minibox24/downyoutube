@@ -52,6 +52,10 @@ export default function DetailsScreen({ navigation, route }) {
           uploader: data.uploader,
           m4aUrl: data.m4a_url,
         });
+      })
+      .catch((_) => {
+        Alert.alert("오류 발생", "영상을 불러오던 중 오류가 발생했습니다.");
+        navigation.goBack();
       });
   }, []);
 
