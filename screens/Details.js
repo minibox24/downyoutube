@@ -6,7 +6,10 @@ import {
   ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
+
+import { openBrowserAsync } from "expo-web-browser";
 
 export default function DetailsScreen({ navigation, route }) {
   const [data, setData] = React.useState({
@@ -15,7 +18,21 @@ export default function DetailsScreen({ navigation, route }) {
     title: null,
     thumbnail: null,
     uploader: null,
+    m4aUrl: null,
   });
+
+  const audioAlert = () => {
+    Alert.alert("음성", "포맷을 선택해주세요.", [
+      {
+        text: "mp3",
+        onPress: () => download(true),
+      },
+      {
+        text: "m4a",
+        onPress: () => openBrowserAsync(data.m4aUrl),
+      },
+    ]);
+  };
 
   const download = (audio) => {
     navigation.navigate("Download", { id: data.id, audio: audio });
@@ -33,6 +50,7 @@ export default function DetailsScreen({ navigation, route }) {
           title: data.title,
           thumbnail: data.thumbnail,
           uploader: data.uploader,
+          m4aUrl: data.m4a_url,
         });
       });
   }, []);
@@ -69,7 +87,7 @@ export default function DetailsScreen({ navigation, route }) {
           <Text style={styles.buttonText}>영상</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => download(true)}
+          onPress={() => audioAlert(true)}
           style={styles.buttonContainer}
         >
           <Text style={styles.buttonText}>음성</Text>
