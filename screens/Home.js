@@ -8,8 +8,21 @@ import {
   Platform,
 } from "react-native";
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, route }) {
   const [query, setQuery] = React.useState("");
+
+  React.useEffect(() => {
+    if (Platform.OS === "web") {
+      if (window.location.pathname === "/watch") {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+
+        if (params.v) {
+          navigation.navigate("Details", { query: params.v });
+        }
+      }
+    }
+  }, []);
 
   return (
     <View style={styles.main}>
