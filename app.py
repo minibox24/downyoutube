@@ -2,7 +2,7 @@ from sanic import Sanic, Request
 from sanic.response import json, file
 from sanic_cors import CORS
 
-from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 import asyncio
 import time
 import uuid
@@ -163,4 +163,4 @@ if not os.path.isdir("./temp"):
     os.makedirs("./temp")
 
 app.add_task(remove_downloads())
-app.run("0.0.0.0")
+app.run("0.0.0.0", port=8000)
