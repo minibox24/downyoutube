@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import { openBrowserAsync } from "expo-web-browser";
+import { apiUrl } from "../config";
 
 export default function DownloadScreen({ route }) {
   let [key, setKey] = React.useState(null);
@@ -16,14 +17,14 @@ export default function DownloadScreen({ route }) {
 
   const download = () => {
     if (data.status === "finished") {
-      openBrowserAsync(`https://c82a-58-123-152-78.ngrok.io/file?key=${key}`);
+      openBrowserAsync(`${apiUrl}/file?key=${key}`);
     }
   };
 
   React.useEffect(() => {
     (async () => {
       const response = await fetch(
-        `https://c82a-58-123-152-78.ngrok.io/download`,
+        `${apiUrl}/download`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -43,7 +44,7 @@ export default function DownloadScreen({ route }) {
       if (!key) return;
 
       const response = await fetch(
-        `https://c82a-58-123-152-78.ngrok.io/status?key=${key}`
+        `${apiUrl}/status?key=${key}`
       );
       const responseJson = await response.json();
 

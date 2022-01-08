@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { openBrowserAsync } from "expo-web-browser";
+import { apiUrl } from "../config";
 
 export default function DetailsScreen({ navigation, route }) {
   const [data, setData] = React.useState({
@@ -25,7 +26,7 @@ export default function DetailsScreen({ navigation, route }) {
   const audioAlert = () => {
     if (Platform.OS === "web") {
       const choose = confirm(
-        "음성 포맷을 선택해주세요.\n\n확인: mp4\n취소: m4a"
+        "음성 포맷을 선택해주세요.\n\n확인: mp3\n취소: m4a"
       );
 
       if (choose) {
@@ -53,7 +54,7 @@ export default function DetailsScreen({ navigation, route }) {
 
   React.useEffect(() => {
     fetch(
-      `https://c82a-58-123-152-78.ngrok.io/info?query=${route.params.query}`
+      `${apiUrl}/info?query=${route.params.query}`
     )
       .then((res) => res.json())
       .then((data) => {
