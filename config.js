@@ -1,1 +1,1 @@
-export const apiUrl = "https://7403-121-88-56-45.ngrok.io";
+export const apiUrl = "https://api.xn--youtube-oi21ai81k.com/";
