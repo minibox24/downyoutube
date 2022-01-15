@@ -14,7 +14,7 @@ export default function HomeScreen({ navigation, route }) {
   const [query, setQuery] = React.useState("");
 
   const appDownload = () => {
-    openBrowserAsync("about:blank");
+    openBrowserAsync("downyoutube.apk");
   };
 
   React.useEffect(() => {
