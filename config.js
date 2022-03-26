@@ -1,1 +1,1 @@
-export const apiUrl = "https://api.dw.minibox.xyz";
+export const apiUrl = "https://api-dy.minibox.xyz";
