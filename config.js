@@ -1,1 +1,1 @@
-export const apiUrl = "https://api.xn--youtube-oi21ai81k.com";
+export const apiUrl = "https://api.dw.minibox.xyz";
