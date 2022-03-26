@@ -5,7 +5,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "build": "eas build -p android --profile production"
   },
   "dependencies": {
     "@react-navigation/native": "^6.0.4",
@@ -23,7 +24,8 @@
     "react-native-web": "~0.13.12"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0"
+    "@babel/core": "^7.9.0",
+    "eas-cli": "^0.48.2"
   },
   "private": true
 }
